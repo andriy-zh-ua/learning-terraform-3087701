@@ -34,10 +34,10 @@ module "blog_vpc" {
 }
 
 # Security group for blog, where HTTP and HTTPS are allowed
-module "blog-sg" {
+module "blog_sg" {
   source      = "terraform-aws-modules/security-group/aws"
   version     = "5.3.1"
-  name        = "blog"
+  name        = "blog-sg"
   description = "Security group for blog, where HTTP and HTTPS are allowed"
   vpc_id      = module.blog_vpc.vpc_id
 
@@ -55,7 +55,7 @@ module "blog_alb" {
   vpc_id  = module.blog_vpc.vpc_id
   subnets = module.blog_vpc.public_subnets
 
-  security_groups = [module.blog-sg.security_group_id]
+  security_groups = [module.blog_sg.security_group_id]
 
   listeners = {
     blog_http = {
@@ -90,7 +90,7 @@ module "blog_autoscaling" {
   vpc_zone_identifier = module.blog_vpc.public_subnets
 
   launch_template_name = "blog"
-  security_groups      = [module.blog-sg.security_group_id]
+  security_groups      = [module.blog_sg.security_group_id]
   instance_type        = var.instance_type
   image_id             = data.aws_ami.app_ami.id
 
